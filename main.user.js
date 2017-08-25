@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Deployment counter
 // @namespace    http://tampermonkey.net/
-// @version      0.8
+// @version      0.9
 // @description  Deployment counter
 // @author       Extreme Ways
 // @updateURL    https://github.com/NoodleSkadoodle/CC-deployment-script/raw/master/main.js
