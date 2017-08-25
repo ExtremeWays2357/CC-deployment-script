@@ -72,8 +72,6 @@
 
     window.onload = function(){
         info = document.getElementById('console_basic');
-        console.log(info);
-        //info.getElementsByTagName(title);
         nrPlayers = $("span[title='Players']").html().replace(/[^0-9]/g, '');
         kindOfGame =  $("span[title='Game Type']").html();
         initializeTeams();
@@ -83,22 +81,18 @@
         switch(kindOfGame){
             case "Doubles":
                 nrTeams = nrPlayers/2;
-                console.log(nrTeams);
                 kindOfGame = 2;
                 break;
             case "Triples":
                 nrTeams = nrPlayers/3;
-                console.log(nrTeams);
                 kindOfGame = 3;
                 break;
             case "Quadruples":
                 nrTeams = nrPlayers/4;
-                console.log(nrTeams);
                 kindOfGame = 4;
                 break;
             default:
                 nrTeams = nrPlayers;
-                console.log(nrTeams);
                 kindOfGame = 1;
                 break;
         }
@@ -111,7 +105,5 @@
             playerNames.push(players[i].innerHTML);
             playerTotals.push(0);
         }
-        console.log(playerNames);
-        console.log(playerTotals);
     }
 })();
