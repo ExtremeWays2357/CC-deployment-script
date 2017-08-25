@@ -28,7 +28,6 @@
             printTeam();
     });
     function handleLog(log){
-        console.log(log);
         for (i=0; i < log.length; i++){
             log[i] = log[i].split(':').pop();
             if (log[i].includes('received')){
