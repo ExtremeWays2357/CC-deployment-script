@@ -4,6 +4,7 @@
 // @version      0.8
 // @description  Deployment counter
 // @author       Extreme Ways
+// @updateURL    https://github.com/NoodleSkadoodle/CC-deployment-script/raw/master/main.js
 // @include      https://*.conquerclub.com/*game.php?game=*
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // ==/UserScript==
