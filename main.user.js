@@ -1,14 +1,13 @@
 // ==UserScript==
 // @name         Deployment counter
 // @namespace    http://tampermonkey.net/
-// @version      0.9
+// @version      1.0
 // @description  Deployment counter
 // @author       Extreme Ways
 // @updateURL    https://github.com/NoodleSkadoodle/CC-deployment-script/raw/master/main.js
 // @include      https://*.conquerclub.com/*game.php?game=*
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // ==/UserScript==
-
 
 (function() {
     var nrPlayers;
@@ -20,19 +19,22 @@
     $('#submit2').one('click', function(){
 
         rawlog = document.getElementById('log').innerHTML;
-        log = rawlog.replace(/<br/g, '\n');
-        logarray = log.split('\n');
+        //log = rawlog.replace(/<br>/g, '\n');
+        logarray = rawlog.split('<br>');
         handleLog(logarray);
         printIndividual();
         if (kindOfGame != 1)
             printTeam();
     });
     function handleLog(log){
+        console.log(log);
         for (i=0; i < log.length; i++){
             log[i] = log[i].split(':').pop();
             if (log[i].includes('received')){
                 deriveDeployment(log[i]);
             }
+			if (log[i].includes('played a set')){
+				deriveSet(log[i])
             else if (log[i].includes('troops added to'))
                 deriveAutodeploy(log[i]);
             else{
@@ -44,8 +46,16 @@
     function deriveDeployment(log){
         logs = log.split('received');
         units = logs[1].split('troops')[0];
+		if (units < 0){
+			console.log("IT WORKS " +units);
+		}
         addUnitsToPlayer(logs[0], units);
     }
+	function deriveSet(log){
+		logs = log.split('worth');
+		units = logs[1].split('troops')[0];
+        addUnitsToPlayer(logs[0], units);
+	}
     function deriveAutodeploy(log){
         logs = log.split('got bonus of');
         units = logs[1].split('troops')[0];
@@ -53,7 +63,7 @@
     }
     function addUnitsToPlayer(player, units){
         player = player.split('"player').pop().split('">')[0];
-        playerTotals[player-1] = Number(playerTotals[player-1]) + Number(units);
+        playerTotals[player-1] = parseInt(playerTotals[player-1]) + parseInt(units);
     }
     function printIndividual(){
         for (i = 0; i < playerTotals.length; i++){
@@ -64,7 +74,7 @@
         for (i = 0; i < nrPlayers; i = i+kindOfGame){
             units = 0;
             for (j = i; j < i + kindOfGame; j++){
-                units += playerTotals[j];
+                units += parseInt(playerTotals[j]);
             }
             console.log("Team " +(j)/kindOfGame+" has deployed " + units + " troops.");
         }
@@ -72,6 +82,8 @@
 
     window.onload = function(){
         info = document.getElementById('console_basic');
+        console.log(info);
+        //info.getElementsByTagName(title);
         nrPlayers = $("span[title='Players']").html().replace(/[^0-9]/g, '');
         kindOfGame =  $("span[title='Game Type']").html();
         initializeTeams();
@@ -81,18 +93,22 @@
         switch(kindOfGame){
             case "Doubles":
                 nrTeams = nrPlayers/2;
+                console.log(nrTeams);
                 kindOfGame = 2;
                 break;
             case "Triples":
                 nrTeams = nrPlayers/3;
+                console.log(nrTeams);
                 kindOfGame = 3;
                 break;
             case "Quadruples":
                 nrTeams = nrPlayers/4;
+                console.log(nrTeams);
                 kindOfGame = 4;
                 break;
             default:
                 nrTeams = nrPlayers;
+                console.log(nrTeams);
                 kindOfGame = 1;
                 break;
         }
@@ -105,5 +121,7 @@
             playerNames.push(players[i].innerHTML);
             playerTotals.push(0);
         }
+        console.log(playerNames);
+        console.log(playerTotals);
     }
 })();
