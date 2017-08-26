@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Deployment counter
 // @namespace    http://tampermonkey.net/
-// @version      1.0.1
+// @version      1.0.2
 // @description  Deployment counter
 // @author       Extreme Ways
 // @updateURL    https://github.com/NoodleSkadoodle/CC-deployment-script/raw/master/main.js
@@ -16,8 +16,11 @@
     var playerNames = [];
     var playerTotals = [];
 
-    $('#submit2').one('click', function(){
-
+    $('#submit2').on('click', function(){
+		populateTeams();
+		/**
+		Listener for the "send message" button. Creates an array out of the log dump for further handling, and prints the results.
+		*/
         rawlog = document.getElementById('log').innerHTML;
         //log = rawlog.replace(/<br>/g, '\n');
         logarray = rawlog.split('<br>');
@@ -27,7 +30,10 @@
             printTeam();
     });
     function handleLog(log){
-        console.log(log);
+		/**
+		Log: the omplete game log, split into an array
+		Reads every line of the log to see if it's about receiving troops. Listens to 'received', 'played a set' and 'troops added to'.
+		*/
         for (i=0; i < log.length; i++){
             log[i] = log[i].split(':').pop();
             if (log[i].includes('received')){
@@ -44,45 +50,71 @@
         }
     }
     function deriveDeployment(log){
-        logs = log.split('received');
+        /**
+		log: the log entry
+		Derives the amount of deploy received.
+		*/
+		logs = log.split('received');
         units = logs[1].split('troops')[0];
-		if (units < 0){
-			console.log("IT WORKS " +units);
-		}
-        addUnitsToPlayer(logs[0], units);
+        addUnitsToPlayer(logs[0], units, 0);
     }
 	function deriveSet(log){
+		/**
+		log: the log entry
+		Derives the amount of deploy from a set received.
+		*/
 		logs = log.split('worth');
 		units = logs[1].split('troops')[0];
-        addUnitsToPlayer(logs[0], units);
+        addUnitsToPlayer(logs[0], units, 0);
 	}
     function deriveAutodeploy(log){
+		/**
+		log: the log entry
+		Derives the amount of autodeploy received.
+		*/
         logs = log.split('got bonus of');
         units = logs[1].split('troops')[0];
-        addUnitsToPlayer(logs[0], units);
+        addUnitsToPlayer(logs[0], units, 1);
     }
-    function addUnitsToPlayer(player, units){
-        player = player.split('"player').pop().split('">')[0];
-        playerTotals[player-1] = parseInt(playerTotals[player-1]) + parseInt(units);
-    }
+    function addUnitsToPlayer(player, units, deploy){
+        /**
+		player: Part of the log entry with the player number.
+		inits: the amount of troops received
+		deploy: 0 for deploy, 1 for autodeploy.
+		*/
+		player = player.split('"player').pop().split('">')[0];
+        playerTotals[player-1][deploy] = parseInt(playerTotals[player-1][deploy]) + parseInt(units);
+
+	}
     function printIndividual(){
+		/**
+		Prints the amount of troops deployed and autodeployed to console individually
+		*/
         for (i = 0; i < playerTotals.length; i++){
-            console.log(playerNames[i] +" has deployed " + playerTotals[i]+" troops.");
-        }
+            console.log(playerNames[i] +" has deployed " + playerTotals[i][0]+" troops.");
+            if (playerTotals[i][1] > 0)
+				console.log(playerNames[i] +" has received " + playerTotals[i][1]+" troops as autodeploys.");
+		}
     }
     function printTeam(){
+		/**
+		Prints the amount of troops deployed and autodeployed to console per team.
+		*/
         for (i = 0; i < nrPlayers; i = i+kindOfGame){
-            units = 0;
+            deploys = 0;
+			autodeploys = 0;
             for (j = i; j < i + kindOfGame; j++){
-                units += parseInt(playerTotals[j]);
+                deploys += parseInt(playerTotals[j][0]);
+				autodeploys += parseInt(playerTotals[j][1]);
             }
-            console.log("Team " +(j)/kindOfGame+" has deployed " + units + " troops.");
+            console.log("Team " +(j)/kindOfGame+" has deployed " + deploys + " troops.");
+            if (autodeploys > 0)
+				console.log("Team " +(j)/kindOfGame+" has received " + autodeploys + " troops as autodeploys.");
         }
     }
 
     window.onload = function(){
         info = document.getElementById('console_basic');
-        console.log(info);
         //info.getElementsByTagName(title);
         nrPlayers = $("span[title='Players']").html().replace(/[^0-9]/g, '');
         kindOfGame =  $("span[title='Game Type']").html();
@@ -91,7 +123,7 @@
 
     function initializeTeams () {
         switch(kindOfGame){
-            case "Doubles":
+			case "Doubles":
                 nrTeams = nrPlayers/2;
                 console.log(nrTeams);
                 kindOfGame = 2;
@@ -107,21 +139,41 @@
                 kindOfGame = 4;
                 break;
             default:
-                nrTeams = nrPlayers;
+				if (kindOfGame.includes("Poly")){
+					kindOfGame = parseInt(kindOfGame.split('(')[1]);
+					nrTeams = 2;
+					nrPlayers = 2 * kindOfGame;
+				}
+				else{
+					nrTeams = nrPlayers;
+					kindOfGame = 1;						
+				}
                 console.log(nrTeams);
-                kindOfGame = 1;
                 break;
+                
         }
-        populateTeams();
+        console.log(kindOfGame);
+		console.log(nrTeams);
+        
     }
     function populateTeams(){
+		/**
+		Initializes the playerNames array with the names of the players, and creates the playerTotals used for keeping track of units received array.
+		*/
         info = document.getElementById('statsTable');
         var players = info.getElementsByClassName('player');
-        for (i=0; i < players.length; i++){
+		playerTotals = [];
+		offset = 1;
+		if ($("span[title='Fog of War']").html() == "Fog")
+			offset++;
+        for (i=0; i < players.length - offset; i++){
             playerNames.push(players[i].innerHTML);
-            playerTotals.push(0);
-        }
+			playerTotals.push([]);
+			playerTotals[i][0] = 0;
+			playerTotals[i][1] = 0;
+		}
         console.log(playerNames);
         console.log(playerTotals);
+		
     }
 })();
