@@ -150,7 +150,10 @@
 				}
                 console.log(nrTeams);
                 break;
+                
         }
+        console.log(kindOfGame);
+		console.log(nrTeams);
         
     }
     function populateTeams(){
