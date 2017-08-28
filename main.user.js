@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Deployment counter
 // @namespace    http://tampermonkey.net/
-// @version      1.0.5
+// @version      1.0.6
 // @description  Deployment counter
 // @author       Extreme Ways
 // @updateURL    https://github.com/NoodleSkadoodle/CC-deployment-script/raw/master/main.js
@@ -113,44 +113,35 @@
         }
     }
 
-	function fixButton(){
-		console.log("begin");
-		console.log($('#countDeploys').parentNode !== undefined);
-
+	function keepButtonAlive(){
 		var interval = setInterval(function(){
-			console.log($('#countDeploys').parentNode !== undefined);
-			if($('#countDeploys').parentNode !== undefined){
-				console.log($('#countDeploys').parentNode);
-			}
+			if($('#countDeploys').parentNode !== undefined){	}
 			else{
 				addButton();
-				console.log("Let's add the button/button added");
-				clearInterval(interval);				
-				}
-		},1000);
+			}
+		},200);
 		
 		console.log("eind");
-	}
-	
+
+	}	
 	function addButton(){
 
 		if ($('#countDeploys') !== undefined){
 			$('#countDeploys').remove();
 		}
-        console.log("There's a button");
 		$('#snapNormal').append(" <button id='countDeploys'>Count deploys</button>");
 		document.getElementById('countDeploys').addEventListener('click', executeCounting);
-		console.log($('#countDeploys'));
 
 	}
 	
 	$(document).ready(function() {
 		addButton();
-		$('#full-log').on('click', fixButton);
+		//$('#full-log').on('click', fixButton);
         nrPlayers = $("span[title='Players']").html().replace(/[^0-9]/g, '');
         kindOfGame =  $("span[title='Game Type']").html();
         initializeTeams();	
-    });
+		keepButtonAlive();
+	});
 
     function initializeTeams () {
         switch(kindOfGame){
