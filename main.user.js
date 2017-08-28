@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Deployment counter
 // @namespace    http://tampermonkey.net/
-// @version      1.0.7
+// @version      1.0.8
 // @description  Deployment counter
 // @author       Extreme Ways
 // @updateURL    https://github.com/NoodleSkadoodle/CC-deployment-script/raw/master/main.js
@@ -36,7 +36,11 @@
                 deriveDeployment(log[i]);
             }
 			if (log[i].includes('played a set'))
-				deriveSet(log[i]);
+				try{
+					deriveSet(log[i]);
+				} catch(err){
+					//Set is nuclear or zombie.
+				}
             else if (log[i].includes('troops added to'))
                 deriveAutodeploy(log[i]);
             else{
