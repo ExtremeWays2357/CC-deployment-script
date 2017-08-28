@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Deployment counter
 // @namespace    http://tampermonkey.net/
-// @version      1.0.3
+// @version      1.0.4
 // @description  Deployment counter
 // @author       Extreme Ways
 // @updateURL    https://github.com/NoodleSkadoodle/CC-deployment-script/raw/master/main.js
@@ -114,22 +114,11 @@
     }
 
   $(document).ready(function() {
-		var fragment = $('<button id="countDeploys">Count deploys</button>');
-		/**
-		var fragment = document.createElement("button");
-		fragment.innerHTML = "Count deploys";
-		fragment.id = "countDeploys";
-		*/
-		console.log(fragment);
-		$('#snapNormal').append(fragment);
+        $('#snapNormal').append(" <button id='countDeploys'>Count deploys</button>");
 		document.getElementById('countDeploys').addEventListener('click', executeCounting);
-		console.log(fragment);
-        info = document.getElementById('console_basic');
-        //info.getElementsByTagName(title);
         nrPlayers = $("span[title='Players']").html().replace(/[^0-9]/g, '');
         kindOfGame =  $("span[title='Game Type']").html();
         initializeTeams();
-		
     });
 
     function initializeTeams () {
@@ -157,15 +146,13 @@
 				}
 				else{
 					nrTeams = nrPlayers;
-					kindOfGame = 1;						
-				}
+					kindOfGame = 1;
+                }
                 console.log(nrTeams);
                 break;
-                
         }
         console.log(kindOfGame);
 		console.log(nrTeams);
-        
     }
     function populateTeams(){
 		/**
@@ -184,7 +171,6 @@
 			playerTotals[i][1] = 0;
 		}
         console.log(playerNames);
-        console.log(playerTotals);
-		
+        console.log(playerTotals);	
     }
 })();
