@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Deployment counter
 // @namespace    http://tampermonkey.net/
-// @version      1.0.2
+// @version      1.0.4
 // @description  Deployment counter
 // @author       Extreme Ways
 // @updateURL    https://github.com/NoodleSkadoodle/CC-deployment-script/raw/master/main.js
@@ -16,7 +16,7 @@
     var playerNames = [];
     var playerTotals = [];
 
-    $('#submit2').on('click', function(){
+    function executeCounting(){
 		populateTeams();
 		/**
 		Listener for the "send message" button. Creates an array out of the log dump for further handling, and prints the results.
@@ -28,7 +28,7 @@
         printIndividual();
         if (kindOfGame != 1)
             printTeam();
-    });
+    }
     function handleLog(log){
 		/**
 		Log: the omplete game log, split into an array
@@ -113,13 +113,13 @@
         }
     }
 
-    window.onload = function(){
-        info = document.getElementById('console_basic');
-        //info.getElementsByTagName(title);
+  $(document).ready(function() {
+        $('#snapNormal').append(" <button id='countDeploys'>Count deploys</button>");
+		document.getElementById('countDeploys').addEventListener('click', executeCounting);
         nrPlayers = $("span[title='Players']").html().replace(/[^0-9]/g, '');
         kindOfGame =  $("span[title='Game Type']").html();
         initializeTeams();
-    };
+    });
 
     function initializeTeams () {
         switch(kindOfGame){
@@ -146,15 +146,13 @@
 				}
 				else{
 					nrTeams = nrPlayers;
-					kindOfGame = 1;						
-				}
+					kindOfGame = 1;
+                }
                 console.log(nrTeams);
                 break;
-                
         }
         console.log(kindOfGame);
 		console.log(nrTeams);
-        
     }
     function populateTeams(){
 		/**
@@ -173,7 +171,6 @@
 			playerTotals[i][1] = 0;
 		}
         console.log(playerNames);
-        console.log(playerTotals);
-		
+        console.log(playerTotals);	
     }
 })();
