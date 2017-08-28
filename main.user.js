@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Deployment counter
 // @namespace    http://tampermonkey.net/
-// @version      1.0.4
+// @version      1.0.7
 // @description  Deployment counter
 // @author       Extreme Ways
 // @updateURL    https://github.com/NoodleSkadoodle/CC-deployment-script/raw/master/main.js
-// @include      https://*.conquerclub.com/*game.php?game=*
+// @include      http*://*.conquerclub.com/*game.php?game=*
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // ==/UserScript==
 
@@ -18,11 +18,7 @@
 
     function executeCounting(){
 		populateTeams();
-		/**
-		Listener for the "send message" button. Creates an array out of the log dump for further handling, and prints the results.
-		*/
         rawlog = document.getElementById('log').innerHTML;
-        //log = rawlog.replace(/<br>/g, '\n');
         logarray = rawlog.split('<br>');
         handleLog(logarray);
         printIndividual();
@@ -113,13 +109,35 @@
         }
     }
 
-  $(document).ready(function() {
-        $('#snapNormal').append(" <button id='countDeploys'>Count deploys</button>");
+	function keepButtonAlive(){
+		var interval = setInterval(function(){
+			if($('#countDeploys').length > 0){	}//do nothing, element exists}
+			else{
+				addButton();
+				clearInterval(interval);
+			}
+		},50);
+		
+	}	
+	function addButton(){
+
+		if ($('#countDeploys') !== undefined){
+			$('#countDeploys').remove();
+		}
+		$('#snapNormal').append(" <button id='countDeploys'>Count deploys</button>");
 		document.getElementById('countDeploys').addEventListener('click', executeCounting);
+
+	}
+	
+	$(document).ready(function() {
+		addButton();
+		$('#full-log').on('click', keepButtonAlive);
+		$('#full-chat').on('click', keepButtonAlive);
+
         nrPlayers = $("span[title='Players']").html().replace(/[^0-9]/g, '');
         kindOfGame =  $("span[title='Game Type']").html();
         initializeTeams();
-    });
+	});
 
     function initializeTeams () {
         switch(kindOfGame){
