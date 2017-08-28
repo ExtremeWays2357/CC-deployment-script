@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Deployment counter
 // @namespace    http://tampermonkey.net/
-// @version      1.0.6
+// @version      1.0.7
 // @description  Deployment counter
 // @author       Extreme Ways
 // @updateURL    https://github.com/NoodleSkadoodle/CC-deployment-script/raw/master/main.js
@@ -18,11 +18,7 @@
 
     function executeCounting(){
 		populateTeams();
-		/**
-		Listener for the "send message" button. Creates an array out of the log dump for further handling, and prints the results.
-		*/
         rawlog = document.getElementById('log').innerHTML;
-        //log = rawlog.replace(/<br>/g, '\n');
         logarray = rawlog.split('<br>');
         handleLog(logarray);
         printIndividual();
@@ -115,14 +111,13 @@
 
 	function keepButtonAlive(){
 		var interval = setInterval(function(){
-			if($('#countDeploys').parentNode !== undefined){	}
+			if($('#countDeploys').length > 0){	}//do nothing, element exists}
 			else{
 				addButton();
+				clearInterval(interval);
 			}
-		},200);
+		},50);
 		
-		console.log("eind");
-
 	}	
 	function addButton(){
 
@@ -136,11 +131,12 @@
 	
 	$(document).ready(function() {
 		addButton();
-		//$('#full-log').on('click', fixButton);
+		$('#full-log').on('click', keepButtonAlive);
+		$('#full-chat').on('click', keepButtonAlive);
+
         nrPlayers = $("span[title='Players']").html().replace(/[^0-9]/g, '');
         kindOfGame =  $("span[title='Game Type']").html();
-        initializeTeams();	
-		keepButtonAlive();
+        initializeTeams();
 	});
 
     function initializeTeams () {
