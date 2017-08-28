@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Deployment counter
 // @namespace    http://tampermonkey.net/
-// @version      1.0.2
+// @version      1.0.5
 // @description  Deployment counter
 // @author       Extreme Ways
 // @updateURL    https://github.com/NoodleSkadoodle/CC-deployment-script/raw/master/main.js
-// @include      https://*.conquerclub.com/*game.php?game=*
+// @include      http*://*.conquerclub.com/*game.php?game=*
 // @require      http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js
 // ==/UserScript==
 
@@ -16,7 +16,7 @@
     var playerNames = [];
     var playerTotals = [];
 
-    $('#submit2').on('click', function(){
+    function executeCounting(){
 		populateTeams();
 		/**
 		Listener for the "send message" button. Creates an array out of the log dump for further handling, and prints the results.
@@ -28,7 +28,7 @@
         printIndividual();
         if (kindOfGame != 1)
             printTeam();
-    });
+    }
     function handleLog(log){
 		/**
 		Log: the omplete game log, split into an array
@@ -113,13 +113,44 @@
         }
     }
 
-    window.onload = function(){
-        info = document.getElementById('console_basic');
-        //info.getElementsByTagName(title);
+	function fixButton(){
+		console.log("begin");
+		console.log($('#countDeploys').parentNode !== undefined);
+
+		var interval = setInterval(function(){
+			console.log($('#countDeploys').parentNode !== undefined);
+			if($('#countDeploys').parentNode !== undefined){
+				console.log($('#countDeploys').parentNode);
+			}
+			else{
+				addButton();
+				console.log("Let's add the button/button added");
+				clearInterval(interval);				
+				}
+		},1000);
+		
+		console.log("eind");
+	}
+	
+	function addButton(){
+
+		if ($('#countDeploys') !== undefined){
+			$('#countDeploys').remove();
+		}
+        console.log("There's a button");
+		$('#snapNormal').append(" <button id='countDeploys'>Count deploys</button>");
+		document.getElementById('countDeploys').addEventListener('click', executeCounting);
+		console.log($('#countDeploys'));
+
+	}
+	
+	$(document).ready(function() {
+		addButton();
+		$('#full-log').on('click', fixButton);
         nrPlayers = $("span[title='Players']").html().replace(/[^0-9]/g, '');
         kindOfGame =  $("span[title='Game Type']").html();
-        initializeTeams();
-    };
+        initializeTeams();	
+    });
 
     function initializeTeams () {
         switch(kindOfGame){
@@ -146,15 +177,13 @@
 				}
 				else{
 					nrTeams = nrPlayers;
-					kindOfGame = 1;						
-				}
+					kindOfGame = 1;
+                }
                 console.log(nrTeams);
                 break;
-                
         }
         console.log(kindOfGame);
 		console.log(nrTeams);
-        
     }
     function populateTeams(){
 		/**
@@ -173,7 +202,6 @@
 			playerTotals[i][1] = 0;
 		}
         console.log(playerNames);
-        console.log(playerTotals);
-		
+        console.log(playerTotals);	
     }
 })();
