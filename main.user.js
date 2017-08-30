@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Deployment counter
 // @namespace    http://tampermonkey.net/
-// @version      1.0.8
+// @version      1.0.9
 // @description  Deployment counter
 // @author       Extreme Ways
 // @updateURL    https://github.com/NoodleSkadoodle/CC-deployment-script/raw/master/main.js
@@ -123,7 +123,7 @@
 		},50);
 		
 	}	
-	function addButton(){
+	function addButton2(){
 
 		if ($('#countDeploys') !== undefined){
 			$('#countDeploys').remove();
@@ -132,7 +132,16 @@
 		document.getElementById('countDeploys').addEventListener('click', executeCounting);
 
 	}
-	
+	function addButton(){
+        $('#snapNormal').append(" <button id='countDeploys'>Count deploys</button>").click(executeCounting);
+        var oldVersion=unsafeWindow.stopWaiting;
+        unsafeWindow.stopWaiting = function() {
+            $('#snapNormal').append(" <button id='countDeploys'>Count deploys</button>").click(executeCounting);
+            return oldVersion();
+        };
+	}
+
+
 	$(document).ready(function() {
 		addButton();
 		$('#full-log').on('click', keepButtonAlive);
